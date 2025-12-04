@@ -49,8 +49,9 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         // Permit login, signup, and OAuth2 endpoints
-                        .requestMatchers("/api/employee/**").permitAll()
+                        .requestMatchers("/api/auth/login", "/api/employee/create", "/ping").permitAll()
                         .anyRequest().authenticated()
+
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)

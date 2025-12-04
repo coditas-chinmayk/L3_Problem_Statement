@@ -26,6 +26,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
     private final EmployeeRepository employeeRepository;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
@@ -34,53 +35,50 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String authHeader = request.getHeader("Authorization");
 
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            if (!request.getRequestURI().startsWith("/api/auth/")) {
-                response.setStatus(401);
-                response.setContentType("application/json");
-                response.getWriter().write(
-                        "{\"success\":false,\"message\":\"Missing or invalid token\",\"status\":\"UNAUTHORIZED\",\"timestamp\":\"" +
-                                java.time.ZonedDateTime.now() + "\"}"
-                );
-            }
+
+        String uri = request.getRequestURI();
+        if (uri.startsWith("/api/auth/") || uri.equals("/ping") || uri.startsWith("/api/employee/create")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        String token = authHeader.substring(7);
-        String email;
-
-
-
-        try {
-            email = jwtUtil.extractEmail(token);
-        } catch (Exception e) {
-            ApiResponseDto<?> error = ApiResponseDto.error("Invalid or malformed token", HttpStatus.UNAUTHORIZED);
-
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-            response.getWriter().write(String.format(
-                    "{\"success\":%s,\"message\":\"%s\",\"status\":\"%s\",\"timestamp\":\"%s\"}",
-                    error.getSuccess(),
-                    error.getMessage(),
-                    error.getStatus()
-            ));
-            return;
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().write("""
+                    {"success":false,"message":"Missing or invalid token","status":"UNAUTHORIZED"}
+                    """);
+            return; // in older code i was calling do filter internal, instead of returning
         }
 
-        if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            var userOptional = employeeRepository.findByEmail(email);
+        String token = authHeader.substring(7);
 
-            if (userOptional.isPresent() && jwtUtil.isTokenValid(token, email)) {
-                var user = userOptional.get();
-                var authority = new SimpleGrantedAuthority("ROLE_" + user.getRole().getRole().name());
-                var authToken = new UsernamePasswordAuthenticationToken(user.getEmail(), null, List.of(authority));
+        try {
+            String email = jwtUtil.extractEmail(token);
 
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+            if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                var userOptional = employeeRepository.findByEmail(email);
+
+                if (userOptional.isPresent() && jwtUtil.isTokenValid(token, email)) {
+                    var user = userOptional.get();
+                    var authority = new SimpleGrantedAuthority("ROLE_" + user.getRole().getRole().name());
+                    var authToken = new UsernamePasswordAuthenticationToken(user.getEmail(), null, List.of(authority));
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
             }
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().write("""
+                    {"success":false,"message":"Invalid or expired token","status":"UNAUTHORIZED"}
+                    """);
+            return;
         }
 
         filterChain.doFilter(request, response);
     }
+
 }

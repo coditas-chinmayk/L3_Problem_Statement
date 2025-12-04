@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
 
@@ -25,6 +26,7 @@ public class EmployeeService {
     private final EmployeeRepository employeeRepository;
     private final RoleRepository roleRepository;
     private final TaskRepository taskRepository;
+    private final PasswordEncoder passwordEncoder;
 
 
     //create
@@ -47,7 +49,7 @@ public class EmployeeService {
         Employee emp = Employee.builder()
                 .name(createDto.getName())
                 .email(createDto.getEmail())
-                .password(createDto.getPassword())
+                .password(passwordEncoder.encode(createDto.getPassword()))
                 .salary(createDto.getSalary())
                 .role(role)
                 .department(createDto.getDepartment())
