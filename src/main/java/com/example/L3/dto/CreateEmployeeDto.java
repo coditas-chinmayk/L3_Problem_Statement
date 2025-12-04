@@ -26,5 +26,5 @@ public class CreateEmployeeDto {
     private String role;
     private String department;
     private String dateOfJoining;
-    private Long Salary;
+    private String salary;
 }

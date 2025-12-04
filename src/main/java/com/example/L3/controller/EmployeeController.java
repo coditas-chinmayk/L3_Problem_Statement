@@ -49,13 +49,14 @@ public class EmployeeController {
         return ResponseEntity.ok(ApiResponseDto.ok("employee created", employeeService.getById(id)));
     }
 
-    @PostMapping("/create")
-    public ResponseEntity<ApiResponseDto<ViewEmployeeDto>> createEmployee(CreateEmployeeDto dto) throws BadRequestException {
+    @PostMapping("/create-employee-now")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponseDto<ViewEmployeeDto>> createEmployee(@Valid @RequestBody CreateEmployeeDto dto) throws BadRequestException {
         return ResponseEntity.ok(ApiResponseDto.ok("employee created", employeeService.createEmployee(dto)));
     }
 
     @PatchMapping("/{id}/update")
-    public ResponseEntity<ApiResponseDto<ViewEmployeeDto>> updateEmployee(UpdateEmpDto dto){
+    public ResponseEntity<ApiResponseDto<ViewEmployeeDto>> updateEmployee(@Valid @RequestBody UpdateEmpDto dto){
         return ResponseEntity.ok(ApiResponseDto.ok("employee created", employeeService.updateEmp(dto)));
     }
 

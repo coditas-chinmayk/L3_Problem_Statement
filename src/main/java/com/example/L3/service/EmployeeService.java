@@ -50,7 +50,7 @@ public class EmployeeService {
                 .name(createDto.getName())
                 .email(createDto.getEmail())
                 .password(passwordEncoder.encode(createDto.getPassword()))
-                .salary(createDto.getSalary())
+                .salary(Long.parseLong(createDto.getSalary()))
                 .role(role)
                 .department(createDto.getDepartment())
                 .build();
