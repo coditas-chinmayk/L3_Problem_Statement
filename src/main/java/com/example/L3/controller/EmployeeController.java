@@ -1,10 +1,6 @@
 package com.example.L3.controller;
 
 import com.example.L3.dto.*;
-import com.example.L3.entity.Employee;
-import com.example.L3.repository.EmployeeRepository;
-import com.example.L3.repository.RoleRepository;
-import com.example.L3.repository.TaskRepository;
 import com.example.L3.security.AuthService;
 import com.example.L3.service.EmployeeService;
 import jakarta.validation.Valid;
@@ -45,8 +41,9 @@ public class EmployeeController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponseDto<ViewEmployeeDto>> toViewEmpDto(@PathVariable Long id){
-        return ResponseEntity.ok(ApiResponseDto.ok("employee created", employeeService.getById(id)));
+        return ResponseEntity.ok(ApiResponseDto.ok("View Employee", employeeService.getById(id)));
     }
 
     @PostMapping("/create-employee-now")
@@ -57,7 +54,7 @@ public class EmployeeController {
 
     @PatchMapping("/{id}/update")
     public ResponseEntity<ApiResponseDto<ViewEmployeeDto>> updateEmployee(@Valid @RequestBody UpdateEmpDto dto){
-        return ResponseEntity.ok(ApiResponseDto.ok("employee created", employeeService.updateEmp(dto)));
+        return ResponseEntity.ok(ApiResponseDto.ok("employee updated", employeeService.updateEmp(dto)));
     }
 
     @DeleteMapping("/{id}")

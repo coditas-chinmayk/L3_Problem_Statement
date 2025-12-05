@@ -5,6 +5,7 @@ import com.example.L3.entity.Task;
 import com.example.L3.service.TaskService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,11 +22,20 @@ public class TaskController {
     private final TaskService taskService;
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     public ResponseEntity<ApiResponseDto<ViewEmpTasksDto>> createTask(@Valid @RequestBody CreateTaskDto dto) {
         ViewEmpTasksDto task = taskService.createTask(dto);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(ApiResponseDto.ok("Task created successfully", task));
+    }
+
+    @PostMapping("/assign")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    public ResponseEntity<ApiResponseDto<TaskDto>> assignTaskToEmp(@Valid @RequestBody AssignTaskDto dto){
+        TaskDto taskDto = taskService.assignTaskToEmp(Long.parseLong(dto.getEmpId()),Long.parseLong(dto.getTaskId()));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponseDto.ok("Task assignment successful", taskDto));
     }
 
     @GetMapping
@@ -40,11 +50,11 @@ public class TaskController {
         return ResponseEntity.ok(ApiResponseDto.ok("Task found", task));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/{taskId}")
     public ResponseEntity<ApiResponseDto<TaskDto>> updateTask(
-            @PathVariable Long id,
-            @Valid @RequestBody UpdateTaskDto dto) {
-        TaskDto updatedTask = taskService.updateTask(id, dto);
+            @PathVariable Long taskId,
+            @Valid @RequestBody UpdateTaskDto dto) throws BadRequestException {
+        TaskDto updatedTask = taskService.updateTask(taskId, dto);
         return ResponseEntity.ok(ApiResponseDto.ok("Task updated successfully", updatedTask));
     }
 

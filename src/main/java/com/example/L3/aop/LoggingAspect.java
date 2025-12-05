@@ -9,12 +9,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class LoggingAspect {
 
-    @Around("execution(*com.example.L3.service.EmployeeService.createEmployee(..))")
+    @Around("execution(* com.example.L3.controller.EmployeeController.createEmployee(..))")
     public Object measureExecutionTime(ProceedingJoinPoint joinPoint) throws Throwable{
         long startTime = System.currentTimeMillis();
         Object result = joinPoint.proceed();
         long elapsedTime = System.currentTimeMillis() - startTime;
-        System.out.println("The Create employee method "+joinPoint.getSignature().getName() +" took"+ elapsedTime + " number of milliseconds to execute");
+        System.out.println("The Create employee method "+joinPoint.getSignature().getName() +" took "+ elapsedTime + " milliseconds to execute");
         return result;
     }
+
 }

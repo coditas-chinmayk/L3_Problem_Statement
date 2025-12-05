@@ -8,6 +8,7 @@ import com.example.L3.repository.EmployeeRepository;
 import com.example.L3.repository.TaskRepository;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.BadRequestException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +17,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 @Service
 @Data
@@ -42,6 +44,13 @@ public class TaskService {
         return  this.viewEmpTasksDto(taskRepository.save(task), emp);
     }
 
+    public TaskDto assignTaskToEmp(Long taskId, Long empId){
+        Employee employee = employeeRepository.findById(empId).orElseThrow(()-> new NoSuchElementException("invalid employee Id"));
+        Task task = taskRepository.findById(taskId).orElseThrow(()-> new NoSuchElementException("invalid task Id"));
+        task.setAssignedTo(employee);
+        return this.toTaskDto(taskRepository.save(task));
+    }
+
     public List<Task> getAllTasks() {
         return taskRepository.findAll();
     }
@@ -52,10 +61,11 @@ public class TaskService {
         return this.toTaskDto(task);
     }
 
-    public TaskDto updateTask(Long id, UpdateTaskDto dto) {
-        Task task = taskRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Task not found"));
+    public TaskDto updateTask(Long taskId, UpdateTaskDto dto) throws BadRequestException {
 
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new NoSuchElementException("Task not found"));
+        if(!Objects.equals(task.getId(), taskId)) throw new BadRequestException("this task does not belong to you");
 
         task.setDescription(dto.getDescription() != null ? dto.getDescription() : task.getDescription());
         task.setDeadline(dto.getDeadline() != null ? LocalDate.parse(dto.getDeadline()) : task.getDeadline());
