@@ -43,13 +43,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-            response.setCharacterEncoding("UTF-8");
-            response.getWriter().write("""
-                    {"success":false,"message":"Missing or invalid token","status":"UNAUTHORIZED"}
-                    """);
-            return; // in older code i was calling do filter internal, instead of returning
+//            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+//            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+//            response.setCharacterEncoding("UTF-8");
+//            response.getWriter().write("""
+//                    {"success":false,"message":"Missing or invalid token","status":"UNAUTHORIZED"}
+//                    """);
+//            return; // in older code i was calling do filter internal, instead of returning
+            filterChain.doFilter(request, response);
+            return;
         }
 
         String token = authHeader.substring(7);
@@ -69,13 +71,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
             }
         } catch (Exception e) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-            response.setCharacterEncoding("UTF-8");
-            response.getWriter().write("""
-                    {"success":false,"message":"Invalid or expired token","status":"UNAUTHORIZED"}
-                    """);
-            return;
+//            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+//            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+//            response.setCharacterEncoding("UTF-8");
+//            response.getWriter().write("""
+//                    {"success":false,"message":"Invalid or expired token","status":"UNAUTHORIZED"}
+//                    """);
+//            return;
         }
 
         filterChain.doFilter(request, response);

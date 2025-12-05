@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.List;
@@ -30,6 +31,7 @@ public class EmployeeService {
 
 
     //create
+    @Transactional
     public ViewEmployeeDto createEmployee(CreateEmployeeDto createDto) throws BadRequestException {
 
         if (employeeRepository.findByEmail(createDto.getEmail()).isPresent()) {

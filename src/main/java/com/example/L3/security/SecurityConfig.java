@@ -48,8 +48,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        // Permit login, signup, and OAuth2 endpoints
-                        .requestMatchers("/api/**").permitAll() //for easy testing
+                        .requestMatchers("/api/employee/login").permitAll()
                         .anyRequest().authenticated()
 
                 )

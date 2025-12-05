@@ -21,8 +21,8 @@ public class TaskController {
     private final TaskService taskService;
 
     @PostMapping
-    public ResponseEntity<ApiResponseDto<Task>> createTask(@Valid @RequestBody CreateTaskDto dto) {
-        Task task = taskService.createTask(dto);
+    public ResponseEntity<ApiResponseDto<ViewEmpTasksDto>> createTask(@Valid @RequestBody CreateTaskDto dto) {
+        ViewEmpTasksDto task = taskService.createTask(dto);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(ApiResponseDto.ok("Task created successfully", task));
@@ -35,16 +35,16 @@ public class TaskController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponseDto<Task>> getTaskById(@PathVariable Long id) {
-        Task task = taskService.getTaskById(id);
+    public ResponseEntity<ApiResponseDto<TaskDto>> getTaskById(@PathVariable Long id) {
+        TaskDto task = taskService.getTaskById(id);
         return ResponseEntity.ok(ApiResponseDto.ok("Task found", task));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponseDto<Task>> updateTask(
+    public ResponseEntity<ApiResponseDto<TaskDto>> updateTask(
             @PathVariable Long id,
             @Valid @RequestBody UpdateTaskDto dto) {
-        Task updatedTask = taskService.updateTask(id, dto);
+        TaskDto updatedTask = taskService.updateTask(id, dto);
         return ResponseEntity.ok(ApiResponseDto.ok("Task updated successfully", updatedTask));
     }
 
@@ -61,10 +61,10 @@ public class TaskController {
     }
 
     @PutMapping("/{id}/status")
-    public ResponseEntity<ApiResponseDto<Task>> updateTaskStatus(
+    public ResponseEntity<ApiResponseDto<TaskDto>> updateTaskStatus(
             @PathVariable Long id,
             @Valid @RequestBody UpdateTaskStatusDto dto) {
-        Task task = taskService.updateTaskStatus(id, dto);
+        TaskDto task = taskService.updateTaskStatus(id, dto);
         return ResponseEntity.ok(ApiResponseDto.ok("Task status updated successfully", task));
     }
 }
