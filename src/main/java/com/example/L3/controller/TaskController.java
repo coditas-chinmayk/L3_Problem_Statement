@@ -55,8 +55,8 @@ public class TaskController {
     }
 
     @GetMapping("/employees/{empId}/tasks")
-    public ResponseEntity<ApiResponseDto<List<Task>>> getTasksForEmployee(@PathVariable Long empId) {
-        List<Task> tasks = taskService.getTasksForEmployee(empId);
+    public ResponseEntity<ApiResponseDto<List<TaskDto>>> getTasksForEmployee(@PathVariable Long empId) {
+        List<TaskDto> tasks = taskService.getTasksForEmployee(empId);
         return ResponseEntity.ok(ApiResponseDto.ok("Tasks for employee retrieved", tasks));
     }
 

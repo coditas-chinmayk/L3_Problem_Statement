@@ -69,10 +69,10 @@ public class TaskService {
         taskRepository.deleteById(id);
     }
 
-    public List<Task> getTasksForEmployee(Long empId) {
+    public List<TaskDto> getTasksForEmployee(Long empId) {
         Employee emp = employeeRepository.findById(empId)
                 .orElseThrow(() -> new NoSuchElementException("Employee not found"));
-        return emp.getTasks();
+        return emp.getTasks().stream().map(this::toTaskDto).toList();
     }
 
     public TaskDto updateTaskStatus(Long id, UpdateTaskStatusDto dto) {
